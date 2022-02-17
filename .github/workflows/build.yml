@@ -29,12 +29,15 @@ jobs:
       #   with:
       #     files: target/release/eww
       #     body: Build for commit ${{ github.sha }}
+      - name: Get short hash
+        id: vars
+        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
       - name: Create tag
         id: tag_version
         uses: mathieudutour/github-tag-action@v6.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          custom_tag: ${{ github.sha }}
+          custom_tag: ${{ steps.vars.outputs.sha_short }}
           tag_prefix: ""
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
