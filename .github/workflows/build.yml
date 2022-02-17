@@ -23,9 +23,22 @@ jobs:
       - uses: Swatinem/rust-cache@v1
       - name: Build x11
         run: cargo build --release
-      - run: ls -alh target
-      - name: Release
-        uses: softprops/action-gh-release@v1
+      - run: ls -alh target/release
+      # - name: Release
+      #   uses: softprops/action-gh-release@v1
+      #   with:
+      #     files: target/release/eww
+      #     body: Build for commit ${{ github.sha }}
+      - name: Create tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.0
         with:
-          files: target/release/eww
-          body: Build for commit ${{ github.sha }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          custom_tag: ${{ github.sha }}
+          tag_prefix: ""
+      - name: Create a GitHub release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.tag_version.outputs.new_tag }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: target/release/eww
